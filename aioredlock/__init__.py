@@ -1,5 +1,5 @@
 from aioredlock.algorithm import Aioredlock
-from aioredlock.errors import LockError, LockAcquiringError, LockRuntimeError
+from aioredlock.errors import LockAcquiringError, LockError, LockRuntimeError
 from aioredlock.lock import Lock
 from aioredlock.sentinel import Sentinel
 

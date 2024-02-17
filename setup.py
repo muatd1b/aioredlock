@@ -11,7 +11,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='aioredlock',
 
-    version='0.7.3',
+    version='0.8.0',
 
     description='Asyncio implementation of Redis distributed locks',
     long_description=long_description,
@@ -35,6 +35,9 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
 
     keywords='redis redlock distributed locks asyncio',
@@ -42,9 +45,9 @@ setup(
     packages=find_packages(),
 
     python_requires='>=3.6',
-    install_requires=['aioredis<2.0.0', 'attrs >= 17.4.0'],
+    install_requires=['redis>=5.0.0', 'attrs >= 17.4.0'],
     extras_require={
-        'test': ['pytest==6.1.0', 'pytest-asyncio', 'pytest-mock', 'pytest-cov', 'flake8'],
+        'test': ['pytest==8.0.0', 'pytest-asyncio', 'pytest-mock', 'pytest-cov', 'flake8'],
         'cicd': ['codecov'],
         'package': ['bump2version', 'twine', 'wheel'],
         'examples': ['aiodocker'],

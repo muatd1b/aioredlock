@@ -2,26 +2,25 @@ import re
 import ssl
 import urllib.parse
 
-import aioredis.sentinel
+from redis.asyncio import Sentinel as RedisSentinel, Redis as AIORedis
 
 
 class SentinelConfigError(Exception):
-    '''
+    """
     Exception raised if Configuration is not valid when instantiating a
     Sentinel object.
-    '''
+    """
 
 
 class Sentinel:
 
     def __init__(self, connection, master=None, password=None, db=None, ssl_context=None):
-        '''
+        """
         The connection address can be one of the following:
          * a dict - {'host': 'localhost', 'port': 6379}
          * a Redis URI - "redis://host:6379/0?encoding=utf-8&master=mymaster";
          * a (host, port) tuple - ('localhost', 6379);
          * or a unix domain socket path string - "/path/to/redis.sock".
-         * a redis connection pool.
 
         :param connection:
             The connection address can be one of the following:
@@ -46,7 +45,7 @@ class Sentinel:
         For example, if 'master' is specified in the connection dictionary,
         but also specified as the master kwarg, the master kwarg will be used
         instead.
-        '''
+        """
         address, kwargs = (), {}
         if isinstance(connection, dict):
             kwargs.update(connection)
@@ -91,25 +90,20 @@ class Sentinel:
 
         if self.master is None:
             raise SentinelConfigError('Master name required for sentinel to be configured')
-
-        kwargs['minsize'] = 1 if 'minsize' not in kwargs else int(kwargs['minsize'])
-        kwargs['maxsize'] = 100 if 'maxsize' not in kwargs else int(kwargs['maxsize'])
+        kwargs['max_connections'] = int(kwargs.get('max_connections', 100))
 
         self.connection = address
         self.redis_kwargs = kwargs
 
-    async def get_sentinel(self):
-        '''
+    def get_sentinel(self):
+        """
         Retrieve sentinel object from aioredis.
-        '''
-        return await aioredis.sentinel.create_sentinel(
-            sentinels=self.connection,
-            **self.redis_kwargs,
-        )
+        """
+        return RedisSentinel(sentinels=self.connection, **self.redis_kwargs)
 
-    async def get_master(self):
-        '''
+    def get_master(self) -> AIORedis:
+        """
         Get ``Redis`` instance for specified ``master``
-        '''
-        sentinel = await self.get_sentinel()
-        return await sentinel.master_for(self.master)
+        """
+        sentinel = self.get_sentinel()
+        return sentinel.master_for(self.master)
